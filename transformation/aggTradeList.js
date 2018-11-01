@@ -50,7 +50,7 @@ const numberWithCommas = (x) => {
     return parts.join(".");
 }
 
-const formatQtyGroupedByPrice = (qtyGroupedByPrice) => {
+const formatQtyGroupedByPrice = qtyGroupedByPrice => {
     const obj = []
     Object.keys(qtyGroupedByPrice).map(price => {
         const qty = parseFloat(qtyGroupedByPrice[price])
@@ -59,7 +59,7 @@ const formatQtyGroupedByPrice = (qtyGroupedByPrice) => {
             price: pfPrice,
             qty: qty.toFixed(8),
             cost:  parseFloat(pfPrice * qty).toFixed(8),
-            qtyFormatted: numberWithCommas(pfPrice.toFixed(8))
+            qtyFormatted: numberWithCommas(qty.toFixed(8))
         })
     });
     return obj
