@@ -14,7 +14,7 @@ Response:
 ]
  */
 const qtyGroupedByPriceReducer = (acc, trade) => {
-    const tradeQty = Number.parseFloat(trade.q);
+    const tradeQty = parseFloat(trade.q);
     if (acc["dateFrom"] > trade.T || acc["dateFrom"] === 0) {
         acc["dateFrom"] = trade.T;
     }
@@ -23,7 +23,7 @@ const qtyGroupedByPriceReducer = (acc, trade) => {
     }
     if (!trade.m) { // false == buyer, true == seller
         acc["qtyGroupedByBuyerPriceTotal"] += tradeQty;
-        acc["buyerCostTotal"] += tradeQty * Number.parseFloat(trade.p)
+        acc["buyerCostTotal"] += tradeQty * parseFloat(trade.p)
         const qtyGroupedByBuyerPrice = acc["qtyGroupedByBuyerPrice"]
         if (trade.p in qtyGroupedByBuyerPrice) {
             qtyGroupedByBuyerPrice[trade.p] += tradeQty
@@ -33,7 +33,7 @@ const qtyGroupedByPriceReducer = (acc, trade) => {
 
     } else {
         acc["qtyGroupedBySellerPriceTotal"] += tradeQty;
-        acc["sellerCostTotal"] += tradeQty * Number.parseFloat(trade.p)
+        acc["sellerCostTotal"] += tradeQty * parseFloat(trade.p)
         const qtyGroupedBySellerPrice = acc["qtyGroupedBySellerPrice"]
         if (trade.p in qtyGroupedBySellerPrice) {
             qtyGroupedBySellerPrice[trade.p] += tradeQty
@@ -52,13 +52,14 @@ const numberWithCommas = (x) => {
 
 const formatQtyGroupedByPrice = (qtyGroupedByPrice) => {
     const obj = []
-    Object.keys(qtyGroupedByPrice).map(function (objectKey) {
-        const price = qtyGroupedByPrice[objectKey]
+    Object.keys(qtyGroupedByPrice).map(price => {
+        const qty = parseFloat(qtyGroupedByPrice[price])
+        const pfPrice = parseFloat(price)
         obj.push({
-            price: objectKey,
-            qty: Number.parseFloat(price).toFixed(8),
-            cost: Number.parseFloat(price) * Number.parseFloat(objectKey),
-            qtyFormatted: numberWithCommas(Number.parseFloat(price).toFixed(8))
+            price: pfPrice,
+            qty: qty.toFixed(8),
+            cost:  parseFloat(pfPrice * qty).toFixed(8),
+            qtyFormatted: numberWithCommas(pfPrice.toFixed(8))
         })
     });
     return obj
@@ -80,14 +81,14 @@ module.exports = {
         return {
             dateFrom: transformation.dateFrom,
             dateTo: transformation.dateTo,
-            qtyGroupedByBuyerPrice: formatQtyGroupedByPrice(transformation.qtyGroupedByBuyerPrice),
-            qtyGroupedByBuyerPriceTotal: Number.parseFloat(transformation.qtyGroupedByBuyerPriceTotal).toFixed(8),
-            buyerQtyTotalFormatted: numberWithCommas(Number.parseFloat(transformation.qtyGroupedByBuyerPriceTotal).toFixed(8)),
-            buyerCostTotalFormatted: numberWithCommas(Number.parseFloat(transformation.buyerCostTotal).toFixed(8)),
-            qtyGroupedBySellerPrice: formatQtyGroupedByPrice(transformation.qtyGroupedBySellerPrice),
-            qtyGroupedBySellerPriceTotal: Number.parseFloat(transformation.qtyGroupedBySellerPriceTotal).toFixed(8),
-            sellerQtyTotalFormatted: numberWithCommas(Number.parseFloat(transformation.qtyGroupedBySellerPriceTotal).toFixed(8)),
-            sellerCostTotalFormatted: numberWithCommas(Number.parseFloat(transformation.sellerCostTotal).toFixed(8))
+            buyerQtyByPrice: formatQtyGroupedByPrice(transformation.qtyGroupedByBuyerPrice),
+            buyerQtyByPriceTotal: Number.parseFloat(transformation.qtyGroupedByBuyerPriceTotal).toFixed(8),
+            buyerQtyTotalFormatted: numberWithCommas(parseFloat(transformation.qtyGroupedByBuyerPriceTotal).toFixed(8)),
+            buyerCostTotalFormatted: numberWithCommas(parseFloat(transformation.buyerCostTotal).toFixed(8)),
+            sellerQtyByPrice: formatQtyGroupedByPrice(transformation.qtyGroupedBySellerPrice),
+            sellerQtyByPriceTotal: Number.parseFloat(transformation.qtyGroupedBySellerPriceTotal).toFixed(8),
+            sellerQtyTotalFormatted: numberWithCommas(parseFloat(transformation.qtyGroupedBySellerPriceTotal).toFixed(8)),
+            sellerCostTotalFormatted: numberWithCommas(parseFloat(transformation.sellerCostTotal).toFixed(8))
         }
     }
 }
