@@ -14,12 +14,22 @@ function buildSymbol(part1,part2) {
     }
 }
 
+function getStartEndTimeQuery(lookback, hours=1) {
+    if (lookback === "true") {
+        const date = new Date();
+        const now = date.getTime();
+        const lookback = date.setHours(date.getHours() - hours)
+        return `&startTime=${lookback}&endTime=${now}`
+    }
+    return '';
+}
+
 module.exports.getAggregatedTradeList = (req, myRes, next) => {
     let atl = []
     const symbol = buildSymbol(req.params.asset1,req.params.asset2)
-    let limit = Number.parseInt(req.params.limit)
-    if (!limit) limit = 1000
-    https.get(`${apiUrl}/aggTrades?symbol=${symbol.pair}&limit=${limit}`, tradesRes => {
+    const lookbackQuery = getStartEndTimeQuery(req.params.lookback);
+    const limit = parseInt(req.params.limit) || 1000;
+    https.get(`${apiUrl}/aggTrades?symbol=${symbol.pair}&limit=${limit}${lookbackQuery}`, tradesRes => {
         tradesRes
             .on('data', chunk => atl.push(chunk))
             .on('end', () => {
@@ -27,6 +37,7 @@ module.exports.getAggregatedTradeList = (req, myRes, next) => {
                 if (atl.code) {
                     return myRes.status(404).json(atl)
                 }
+                console.log(atl);
                 const recentTradeList = atlTransform.aggTradeList(atl)
                 recentTradeList["symbol"] = symbol.pair
                 recentTradeList["asset1"] = symbol.asset1
