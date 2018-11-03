@@ -4,7 +4,8 @@
   "description": "Analyses recent trade order activity",
   "main": "index.js",
   "scripts": {
-    "nodemon": "nodemon ./server.js"
+    "nodemon": "nodemon ./server.js",
+    "test": "jasmine"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +14,7 @@
     "express": "^4.16.4"
   },
   "devDependencies": {
+    "jasmine": "^3.3.0",
     "nodemon": "^1.18.4"
   }
 }
