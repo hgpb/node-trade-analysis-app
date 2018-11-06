@@ -1,20 +1,31 @@
 /**
- * Aggregates quantity(q) based on price (p) time(T) and buyermaker(m)
+ * Aggregates quantity(q) based on time(T) and buyermaker(m)
  */
 
-module.exports = (data) => {
-    const result = []
+module.exports = (trades) => {
+    const items = []
     const cache = {}
-    for (let item of data) {
-        const qty = parseFloat(item.q)
-        const key = JSON.stringify({ p: item.p, T: item.t, m: item.m })
+    for (let item of trades) {
+
+        const itemCopy = {...item} // don't want to alter the underlying trade data
+        itemCopy.T = Math.round(itemCopy.T / 1000)
+
+        const key = JSON.stringify({ T: itemCopy.T, m: itemCopy.m })
         if (cache[key]) {
-            cache[key][0] = (parseFloat(cache[key][0]) + qty).toFixed(8)
-            result[cache[key][1]].q = (parseFloat(result[cache[key][1]].q) + qty).toFixed(8)
+            // aggregate cached quantity
+            cache[key][0] = (parseFloat(cache[key][0]) + parseFloat(itemCopy.q)).toFixed(8)
+            // update cached item and copy with quantity
+            items[cache[key][1]].q = cache[key][0]
+            itemCopy.q = cache[key][0]
+            // store in cache highest priced item
+            const itemPrice = parseFloat(itemCopy.p)
+            if (itemPrice > parseFloat(items[cache[key][1]].p)) {
+                items[cache[key][1]] = itemCopy
+            }
         } else {
-            result.push(item)
-            cache[key] = [qty.toFixed(8), result.length-1]
+            items.push(itemCopy)
+            cache[key] = [itemCopy.q, items.length-1]
         }
     }
-    return result
+    return items
 }
