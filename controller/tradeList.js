@@ -14,14 +14,11 @@ function buildSymbol(part1,part2) {
     }
 }
 
-function getStartEndTimeQuery(lookback, hours=1) {
-    if (lookback === "true") {
-        const date = new Date();
-        const now = date.getTime();
-        const lookback = date.setHours(date.getHours() - hours)
-        return `&startTime=${lookback}&endTime=${now}`
-    }
-    return '';
+function getStartEndTimeQuery(min=5) {
+    const date = new Date();
+    const now = date.getTime();
+    const lookback = date.setMinutes(date.getMinutes() - min)
+    return `&startTime=${lookback}&endTime=${now}`
 }
 
 module.exports.getAggregatedTradeList = (req, myRes, next) => {
